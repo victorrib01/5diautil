@@ -1,9 +1,26 @@
+# robots.txt para 5diautil.com.br
+# Permite que todos os crawlers indexem o site
+
 User-agent: *
 Allow: /
 
-# Sitemap
+# Domínio preferido (usado pelo Yandex; Google usa canonical no HTML)
+Host: www.5diautil.com.br
+
+# Localização do sitemap (obrigatório para boa indexação)
 Sitemap: https://www.5diautil.com.br/sitemap.xml
 
-# Bloquear arquivos desnecessários
+# Bloquear pastas que não devem ser indexadas (segurança/performance)
 Disallow: /node_modules/
 Disallow: /dist/
+Disallow: /.vercel/
+
+# Crawlers específicos (opcional: regras iguais por padrão)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

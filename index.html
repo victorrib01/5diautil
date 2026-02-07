@@ -17,6 +17,7 @@
     <meta name="geo.region" content="BR" />
     <meta name="geo.placename" content="Brasil" />
     <meta name="theme-color" content="#2563eb" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -157,6 +158,95 @@
       .footer a:hover {
         color: #1d4ed8;
         text-decoration: underline;
+      }
+
+      /* Contato */
+      .contact-section {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        text-align: left;
+      }
+      .contact-section h2 {
+        font-size: 1rem;
+        color: #334155;
+        margin-bottom: 0.5rem;
+      }
+      .contact-section p {
+        font-size: 0.85rem;
+        color: #475569;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+      }
+      .contact-form label {
+        display: block;
+        font-size: 0.85rem;
+        color: #475569;
+        margin-bottom: 4px;
+      }
+      .contact-form input,
+      .contact-form textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+      }
+      .contact-form textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+      .contact-form .honeypot {
+        position: absolute;
+        left: -9999px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .contact-form .turnstile-wrap {
+        margin: 12px 0 16px;
+      }
+      .contact-form button[type="submit"] {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+      }
+      .contact-form button[type="submit"]:hover {
+        background: #1d4ed8;
+      }
+      .contact-form button[type="submit"]:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+      .contact-form .form-feedback {
+        font-size: 0.9rem;
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        display: none;
+      }
+      .contact-form .form-feedback.success {
+        display: block;
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+      }
+      .contact-form .form-feedback.error {
+        display: block;
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
       }
     </style>
     
@@ -381,6 +471,35 @@
           </p>
         </section>
 
+        <section class="contact-section" aria-label="Contato e correções">
+          <h2>Encontrou um erro nos dados?</h2>
+          <p>Se algum feriado ou data estiver incorreta, envie uma mensagem. Sua mensagem será enviada com segurança e não divulgamos seu e-mail.</p>
+          <form id="contact-form" class="contact-form" novalidate>
+            <div class="honeypot" aria-hidden="true">
+              <label for="website">Site (não preencha)</label>
+              <input type="text" id="website" name="website" autocomplete="off" tabindex="-1" />
+            </div>
+            <div>
+              <label for="contact-message">Mensagem <span style="color:#dc2626">*</span></label>
+              <textarea id="contact-message" name="message" required minlength="10" maxlength="2000" placeholder="Ex: O feriado de Corpus Christi em 2025 está incorreto..." rows="4"></textarea>
+            </div>
+            <div>
+              <label for="contact-name">Seu nome (opcional)</label>
+              <input type="text" id="contact-name" name="name" maxlength="100" placeholder="Como podemos te chamar" />
+            </div>
+            <div>
+              <label for="contact-email">E-mail (opcional)</label>
+              <input type="email" id="contact-email" name="email" placeholder="seu@email.com" />
+            </div>
+            <div class="turnstile-wrap">
+              <!-- Em produção: troque 1x00000000000000000000AA pela sua Site Key do Turnstile (CONTACT_SETUP.md) -->
+              <div class="cf-turnstile" id="turnstile-widget" data-sitekey="1x00000000000000000000AA"></div>
+            </div>
+            <button type="submit" id="contact-submit">Enviar mensagem</button>
+            <div id="contact-feedback" class="form-feedback" role="status"></div>
+          </form>
+        </section>
+
       <footer class="footer" role="contentinfo">
         Desenvolvido por
         <a
@@ -393,174 +512,7 @@
     </div>
     </main>
 
-    <script>
-      // === LÓGICA DE FERIADOS E DATA ===
-
-      function getEasterDate(year) {
-        const a = year % 19;
-        const b = Math.floor(year / 100);
-        const c = year % 100;
-        const d = Math.floor(b / 4);
-        const e = b % 4;
-        const f = Math.floor((b + 8) / 25);
-        const g = Math.floor((b - f + 1) / 3);
-        const h = (19 * a + b - d - g + 15) % 30;
-        const i = Math.floor(c / 4);
-        const k = c % 4;
-        const l = (32 + 2 * e + 2 * i - h - k) % 7;
-        const m = Math.floor((a + 11 * h + 22 * l) / 451);
-        const month = Math.floor((h + l - 7 * m + 114) / 31);
-        const day = ((h + l - 7 * m + 114) % 31) + 1;
-        return new Date(year, month - 1, day);
-      }
-
-      function getHolidays(year) {
-        const easter = getEasterDate(year);
-
-        const carnival = new Date(easter);
-        carnival.setDate(easter.getDate() - 47);
-        const goodFriday = new Date(easter);
-        goodFriday.setDate(easter.getDate() - 2);
-        const corpusChristi = new Date(easter);
-        corpusChristi.setDate(easter.getDate() + 60);
-
-        const holidays = [
-          { d: 1, m: 0, name: "Confraternização Universal" },
-          {
-            d: carnival.getDate(),
-            m: carnival.getMonth(),
-            name: "Carnaval (Facultativo)",
-          },
-          {
-            d: goodFriday.getDate(),
-            m: goodFriday.getMonth(),
-            name: "Sexta-feira Santa",
-          },
-          { d: 21, m: 3, name: "Tiradentes" },
-          { d: 1, m: 4, name: "Dia do Trabalho" },
-          {
-            d: corpusChristi.getDate(),
-            m: corpusChristi.getMonth(),
-            name: "Corpus Christi",
-          },
-          { d: 7, m: 8, name: "Independência do Brasil" },
-          { d: 12, m: 9, name: "Nossa Sra. Aparecida" },
-          { d: 2, m: 10, name: "Finados" },
-          { d: 15, m: 10, name: "Proclamação da República" },
-          { d: 20, m: 10, name: "Dia da Consciência Negra" },
-          { d: 25, m: 11, name: "Natal" },
-        ];
-
-        return holidays;
-      }
-
-      function isBusinessDay(date, holidays) {
-        const dayOfWeek = date.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-
-        const isHoliday = holidays.some(
-          (h) => h.d === date.getDate() && h.m === date.getMonth()
-        );
-        return !isHoliday;
-      }
-
-      function calculateBusinessDay(year, month, targetCount) {
-        const holidays = getHolidays(year);
-        let count = 0;
-        let day = 1;
-        let finalDate = null;
-
-        while (count < targetCount) {
-          let currentDate = new Date(year, month, day);
-          if (currentDate.getMonth() !== month) break;
-
-          if (isBusinessDay(currentDate, holidays)) {
-            count++;
-          }
-          if (count === targetCount) {
-            finalDate = currentDate;
-          }
-          day++;
-        }
-        return {
-          date: finalDate,
-          holidaysInMonth: holidays.filter((h) => h.m === month),
-        };
-      }
-
-      // === INTERFACE ===
-
-      const monthSelect = document.getElementById("monthSelect");
-      const yearSelect = document.getElementById("yearSelect");
-      const targetSelect = document.getElementById("targetDay");
-
-      const months = [
-        "Janeiro",
-        "Fevereiro",
-        "Março",
-        "Abril",
-        "Maio",
-        "Junho",
-        "Julho",
-        "Agosto",
-        "Setembro",
-        "Outubro",
-        "Novembro",
-        "Dezembro",
-      ];
-      months.forEach((m, i) => monthSelect.add(new Option(m, i)));
-
-      const currentYear = new Date().getFullYear();
-      for (let i = currentYear - 1; i <= currentYear + 5; i++) {
-        yearSelect.add(new Option(i, i));
-      }
-
-      const today = new Date();
-      monthSelect.value = today.getMonth();
-      yearSelect.value = today.getFullYear();
-
-      function updateUI() {
-        const month = parseInt(monthSelect.value);
-        const year = parseInt(yearSelect.value);
-        const target = parseInt(targetSelect.value);
-
-        const result = calculateBusinessDay(year, month, target);
-
-        const dateDisplay = document.getElementById("resultDate");
-        const weekdayDisplay = document.getElementById("resultWeekday");
-        const holidaysList = document.getElementById("holidaysList");
-
-        if (result.date) {
-          dateDisplay.textContent = result.date.toLocaleDateString("pt-BR");
-          weekdayDisplay.textContent = result.date.toLocaleDateString("pt-BR", {
-            weekday: "long",
-          });
-        } else {
-          dateDisplay.textContent = "Erro";
-          weekdayDisplay.textContent = "Data inválida";
-        }
-
-        holidaysList.innerHTML =
-          result.holidaysInMonth.length > 0
-            ? "<strong>Feriados/Facultativos no mês:</strong><br>"
-            : "";
-        result.holidaysInMonth
-          .sort((a, b) => a.d - b.d)
-          .forEach((h) => {
-            holidaysList.innerHTML += `
-                <div class="holiday-item">
-                    <span>${h.name}</span>
-                    <span class="holiday-date">${h.d}/${h.m + 1}</span>
-                </div>
-            `;
-          });
-      }
-
-      monthSelect.addEventListener("change", updateUI);
-      yearSelect.addEventListener("change", updateUI);
-      targetSelect.addEventListener("change", updateUI);
-
-      updateUI();
-    </script>
+    <script type="module" src="/src/calculator.js"></script>
+    <script type="module" src="/src/contact-form.js"></script>
   </body>
 </html>
