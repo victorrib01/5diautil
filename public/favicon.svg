@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <rect x="3" y="6" width="42" height="39" rx="9" fill="#0b5d3f" />
+  <path d="M3 15 h42 v3 H3 z" fill="#08432d" />
+  <rect x="3" y="6" width="42" height="9" rx="4.5" fill="#08432d" />
+  <rect x="12" y="2" width="5" height="9" rx="2.5" fill="#08432d" />
+  <rect x="31" y="2" width="5" height="9" rx="2.5" fill="#08432d" />
+  <text x="24" y="38" font-size="18" font-weight="800" text-anchor="middle" fill="#ffffff" font-family="Inter, -apple-system, 'Segoe UI', sans-serif">5º</text>
+</svg>
