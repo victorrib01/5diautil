@@ -4,6 +4,34 @@
   const feedback = document.getElementById('contact-feedback');
   if (!form || !submitBtn || !feedback) return;
 
+  // O script do Turnstile só carrega quando o formulário se aproxima da tela
+  // (ou recebe foco), para não pesar no carregamento inicial da página.
+  let turnstileRequested = false;
+  function loadTurnstile() {
+    if (turnstileRequested) return;
+    turnstileRequested = true;
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+
+  form.addEventListener('focusin', loadTurnstile);
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      function (entries) {
+        if (entries.some(function (entry) { return entry.isIntersecting; })) {
+          loadTurnstile();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+    observer.observe(form);
+  } else {
+    loadTurnstile();
+  }
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
