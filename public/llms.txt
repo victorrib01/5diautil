@@ -1,0 +1,14 @@
+# 5º Dia Útil
+
+> Calculadora gratuita do 5º dia útil do mês no Brasil, em https://www.5diautil.com.br. Mostra quando cai o dia do pagamento, descontando fins de semana e todos os feriados nacionais (incluindo os móveis: Carnaval, Sexta-feira Santa e Corpus Christi). Também calcula o 1º, 10º e 15º dia útil.
+
+Contexto legal: o artigo 459, §1º, da CLT determina que o salário mensal seja pago até o 5º dia útil do mês seguinte ao trabalhado. A calculadora usa dias úteis bancários (segunda a sexta, sem feriados nacionais).
+
+## Páginas
+
+- [Calculadora e tabela anual](https://www.5diautil.com.br/): calculadora interativa de qualquer mês e ano, tabela com o 5º dia útil de todos os meses do ano atual e do próximo, feriados considerados e perguntas frequentes.
+- Páginas mensais (ex.: https://www.5diautil.com.br/agosto-2026/): data exata do 5º dia útil do mês, os cinco primeiros dias úteis, o 1º/10º/15º dia útil e os feriados do mês. O padrão de URL é /mes-ano/ (sem acentos).
+
+## Autor
+
+- [Victor Ribeiro](https://www.victorrib.com.br)
